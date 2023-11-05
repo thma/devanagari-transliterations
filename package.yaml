@@ -1,0 +1,70 @@
+name:                devanagari-transliterations
+version:             0.1.0.0
+github:              "thma/devanagari-transliterations"
+license:             BSD-3-Clause
+author:              "Thomas Mahler"
+maintainer:          "thma@apache.org"
+copyright:           "2023 Thomas Mahler"
+
+extra-source-files:
+- README.md
+
+# Metadata used when publishing your package
+# synopsis:            Short description of your package
+# category:            Web
+
+# To avoid duplicated efforts in documentation and dealing with the
+# complications of embedding Haddock markup inside cabal files, it is
+# common to point users to the README.md file.
+description:         Please see the README on GitHub at <https://github.com/thma/devanagari-transliterations#readme>
+
+language: GHC2021    # See https://ghc-proposals.readthedocs.io/en/latest/proposals/0380-ghc2021.html
+
+default-extensions:
+#- DuplicateRecordFields
+- DeriveGeneric
+- DeriveAnyClass
+- DerivingStrategies
+- OverloadedStrings
+- TemplateHaskell
+- QuasiQuotes
+- LambdaCase
+
+dependencies:
+- base >= 4.7 && < 5
+- containers
+- text
+- text-short
+- deepseq
+- array
+- extra
+
+ghc-options:
+- -Wall
+- -Wcompat
+- -Widentities
+- -Wincomplete-record-updates
+- -Wincomplete-uni-patterns
+- -Wmissing-export-lists
+- -Wmissing-home-modules
+- -Wpartial-fields
+- -Wredundant-constraints
+
+library:
+  source-dirs: src
+
+
+tests:
+  devanagari-transliterations-test:
+    main:                Spec.hs
+    source-dirs:         test
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - devanagari-transliterations
+    - hspec
+    - QuickCheck
+    - hspec-hedgehog
+    - hedgehog

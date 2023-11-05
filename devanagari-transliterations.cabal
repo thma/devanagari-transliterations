@@ -1,0 +1,88 @@
+cabal-version: 2.2
+
+-- This file has been generated from package.yaml by hpack version 0.36.0.
+--
+-- see: https://github.com/sol/hpack
+
+name:           devanagari-transliterations
+version:        0.1.0.0
+description:    Please see the README on GitHub at <https://github.com/thma/devanagari-transliterations#readme>
+homepage:       https://github.com/thma/devanagari-transliterations#readme
+bug-reports:    https://github.com/thma/devanagari-transliterations/issues
+author:         Thomas Mahler
+maintainer:     thma@apache.org
+copyright:      2023 Thomas Mahler
+license:        BSD-3-Clause
+license-file:   LICENSE
+build-type:     Simple
+extra-source-files:
+    README.md
+
+source-repository head
+  type: git
+  location: https://github.com/thma/devanagari-transliterations
+
+library
+  exposed-modules:
+      Data.Char.Devanagari.DevanagariTokens
+      Data.Char.Devanagari.Generators
+      Data.Char.Devanagari.Tokenizer
+      Data.Char.Devanagari.TokenTables
+  other-modules:
+      Paths_devanagari_transliterations
+  autogen-modules:
+      Paths_devanagari_transliterations
+  hs-source-dirs:
+      src
+  default-extensions:
+      DeriveGeneric
+      DeriveAnyClass
+      DerivingStrategies
+      OverloadedStrings
+      TemplateHaskell
+      QuasiQuotes
+      LambdaCase
+  ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints
+  build-depends:
+      array
+    , base >=4.7 && <5
+    , containers
+    , deepseq
+    , extra
+    , text
+    , text-short
+  default-language: GHC2021
+
+test-suite devanagari-transliterations-test
+  type: exitcode-stdio-1.0
+  main-is: Spec.hs
+  other-modules:
+      IoUtils
+      Paths_devanagari_transliterations
+  autogen-modules:
+      Paths_devanagari_transliterations
+  hs-source-dirs:
+      test
+  default-extensions:
+      DeriveGeneric
+      DeriveAnyClass
+      DerivingStrategies
+      OverloadedStrings
+      TemplateHaskell
+      QuasiQuotes
+      LambdaCase
+  ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      QuickCheck
+    , array
+    , base >=4.7 && <5
+    , containers
+    , deepseq
+    , devanagari-transliterations
+    , extra
+    , hedgehog
+    , hspec
+    , hspec-hedgehog
+    , text
+    , text-short
+  default-language: GHC2021
