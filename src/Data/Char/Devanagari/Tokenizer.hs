@@ -1,12 +1,13 @@
-module Data.Char.Devanagari.Tokenizer (
-    selectTokenizerByContent
-  , tokenize
-  , fromDevanagari
-  , fromIso
-  , fromHarvard
-  , fromIast
-  , Tokenizer
-) where
+module Data.Char.Devanagari.Tokenizer
+  ( selectTokenizerByContent,
+    tokenize,
+    fromDevanagari,
+    fromIso,
+    fromHarvard,
+    fromIast,
+    Tokenizer,
+  )
+where
 
 {-
   This module contains Tokenizers for the Devanagari script and its roman transliterations Harvard-Kyoto, IAST and ISO15919.
@@ -14,18 +15,23 @@ module Data.Char.Devanagari.Tokenizer (
   tokenizer to use.
 -}
 
-import           Data.Map.Strict (Map)
-import qualified Data.Map.Strict as Map
-import qualified Data.Text.Short as T
-import           Data.Text.Short (ShortText)
-import           Data.Maybe (isJust)
-import           Data.Sequence ( empty, (|>), Seq((:<|), Empty) )
-import           Data.Char.Devanagari.DevanagariTokens
-import           Data.Char.Devanagari.TokenTables
 import Control.Monad (join)
+import Data.Char.Devanagari.DevanagariTokens
+import Data.Char.Devanagari.TokenTables
+import Data.Map.Strict (Map)
+import Data.Map.Strict qualified as Map
+import Data.Maybe (isJust)
+import Data.Sequence
+  ( Seq (Empty, (:<|)),
+    empty,
+    (|>),
+  )
+import Data.Text.Short (ShortText)
+import Data.Text.Short qualified as T
 
-type Tokenizer  = (ShortText -> Seq DevanagariToken)
-type ParseMap    = Map ShortText DevanagariToken
+type Tokenizer = (ShortText -> Seq DevanagariToken)
+
+type ParseMap = Map ShortText DevanagariToken
 
 harvardKyotoParseMap :: ParseMap
 harvardKyotoParseMap = Map.fromList (harvardKyotoTable ++ inputVirams)
@@ -43,15 +49,13 @@ parse :: ParseMap -> ShortText -> Seq DevanagariToken
 parse pMap s = parse1 s pMap empty
   where
     parse1 :: ShortText -> ParseMap -> Seq DevanagariToken -> Seq DevanagariToken
-    parse1 str _ tokens
-      | str == T.empty = tokens
-    parse1 str parseMap tokens = 
+    parse1 str parseMap tokens =
       case tryMatch str 3 parseMap of
-        Just (token, rest) -> parse1 rest parseMap (tokens |> token)
-        Nothing -> 
+        Just (token, _rest) -> tokens |> token
+        Nothing ->
           case tryMatch str 2 parseMap of
             Just (token, rest) -> parse1 rest parseMap (tokens |> token)
-            Nothing -> 
+            Nothing ->
               case tryMatch str 1 parseMap of
                 Just (token, rest) -> parse1 rest parseMap (tokens |> token)
                 Nothing -> parse1 (T.drop 1 str) parseMap (tokens |> Unmapped (head $ T.unpack $ T.take 1 str))
@@ -63,7 +67,7 @@ parse pMap s = parse1 s pMap empty
           maybeToken = Map.lookup tok parseMap
        in case maybeToken of
             Just token -> Just (token, rest)
-            Nothing    -> Nothing
+            Nothing -> Nothing
 
 fromIast :: Tokenizer
 fromIast = parse iastParseMap
@@ -93,15 +97,14 @@ tokenize = join selectTokenizerByContent
 selectTokenizerByContent :: ShortText -> Tokenizer
 selectTokenizerByContent str
   | containsDevanagari str = fromDevanagari
-  | containsIso        str = fromIso
-  | containsIast       str = fromIast
+  | containsIso str        = fromIso
+  | containsIast str       = fromIast
   | otherwise              = fromHarvard
-      where
-        containsDevanagari = containsAnyOf (['\x900' ..'\x963'] ++ ['\x966' .. '\x97F'])  -- Unicode section for Devanagari
-        containsIso        = containsAnyOf ("ēōṁ" ++ ['\0325', '\0304'])                  -- ISO15919 diacritics
-        containsIast       = containsAnyOf (['\241' .. '\363'] ++ ['\7693' .. '\7789'])   -- IAST diacritics
-        
-        containsAnyOf :: [Char] -> ShortText -> Bool
-        containsAnyOf chars text   = T.any (`isInfixOf` text) $ T.pack chars
-        isInfixOf c text = isJust (T.find (== c) text)
-
+  where
+    containsDevanagari = containsAnyOf (['\x900' .. '\x963'] ++ ['\x966' .. '\x97F']) -- Unicode section for Devanagari
+    containsIso        = containsAnyOf ("ēōṁ" ++ ['\0325', '\0304']) -- ISO15919 diacritics
+    containsIast       = containsAnyOf (['\241' .. '\363'] ++ ['\7693' .. '\7789']) -- IAST diacritics
+   
+    containsAnyOf :: [Char] -> ShortText -> Bool
+    containsAnyOf chars text = T.any (`isInfixOf` text) $ T.pack chars
+    isInfixOf c text = isJust (T.find (== c) text)
