@@ -49,13 +49,15 @@ parse :: ParseMap -> ShortText -> Seq DevanagariToken
 parse pMap s = parse1 s pMap empty
   where
     parse1 :: ShortText -> ParseMap -> Seq DevanagariToken -> Seq DevanagariToken
-    parse1 str parseMap tokens =
+    parse1 str _ tokens
+      | str == T.empty = tokens
+    parse1 str parseMap tokens = 
       case tryMatch str 3 parseMap of
-        Just (token, _rest) -> tokens |> token
-        Nothing ->
+        Just (token, rest) -> parse1 rest parseMap (tokens |> token)
+        Nothing -> 
           case tryMatch str 2 parseMap of
             Just (token, rest) -> parse1 rest parseMap (tokens |> token)
-            Nothing ->
+            Nothing -> 
               case tryMatch str 1 parseMap of
                 Just (token, rest) -> parse1 rest parseMap (tokens |> token)
                 Nothing -> parse1 (T.drop 1 str) parseMap (tokens |> Unmapped (head $ T.unpack $ T.take 1 str))
@@ -67,7 +69,7 @@ parse pMap s = parse1 s pMap empty
           maybeToken = Map.lookup tok parseMap
        in case maybeToken of
             Just token -> Just (token, rest)
-            Nothing -> Nothing
+            Nothing    -> Nothing
 
 fromIast :: Tokenizer
 fromIast = parse iastParseMap

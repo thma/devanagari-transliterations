@@ -84,6 +84,16 @@ spec = do
       (toDevanagari . fromHarvard) harvard' `shouldBe` pack "सद्गमये"
       let harvard'' = pack "vakSyAmi"
       (toDevanagari . fromHarvard) harvard'' `shouldBe` pack "वक्ष्यामि"
+    it "adds a virama if a consonant is not followed by a vowel" $ do
+      let harvard' = pack "param "
+          tokens = tokenize harvard'
+      tokens `shouldBe` fromList [Cons P, Vow A, Cons R, Vow A, Cons M, Unmapped ' ']
+      toDevanagari tokens `shouldBe` pack "परम् "
+    it "can detect tokens up to 3 chars" $ do
+      let harvard' = pack "parlRRlRRm "
+          tokens = tokenize harvard'
+      tokens `shouldBe` fromList [Cons P, Vow A, Cons R, Vow LII, Vow LII, Cons M, Unmapped ' ']
+      toDevanagari tokens `shouldBe` pack "परॣॡम् "
     it "can enforce usage of an explicit virama to suppress consonant ligatures " $ do
       let harvard' = pack "sad_gamaye"
           deva' = pack ("सद्" ++ zwnj ++ "गमये")
