@@ -54,10 +54,10 @@ mapToken m token =
 
 mapIndependent, mapDependent, mapIast, mapHarvard, mapIso :: DevanagariToken -> TS.ShortText
 mapIndependent = mapToken independentMapDevanagari
-mapDependent   = mapToken dependentMapDevanagari
-mapIast        = mapToken iastMap
-mapHarvard     = mapToken harvardMap
-mapIso         = mapToken isoMap
+mapDependent = mapToken dependentMapDevanagari
+mapIast = mapToken iastMap
+mapHarvard = mapToken harvardMap
+mapIso = mapToken isoMap
 
 toDevanagari :: Generator
 toDevanagari = translateToDeva TS.empty
@@ -69,14 +69,14 @@ translateToDeva acc (x :<| xs) =
    in translateToDeva (acc `TS.append` firstChars) restTokens
   where
     translateToken :: DevanagariToken -> Seq DevanagariToken -> (TS.ShortText, Seq DevanagariToken)
-    translateToken token Empty                         = (mapIndependent token, Empty)
-    translateToken cons@(Cons _) (Vow A :<| ts)        = (mapIndependent cons, ts)
-    translateToken cons@(Cons _) (vow@(Vow _) :<| ts)  = (mapIndependent cons `TS.append` mapDependent vow, ts)
-    translateToken cons@(Cons _) ts@(Cons _ :<| _)     = (mapIndependent cons `TS.append` mapIndependent Virama, ts)
+    translateToken token Empty = (mapIndependent token, Empty)
+    translateToken cons@(Cons _) (Vow A :<| ts) = (mapIndependent cons, ts)
+    translateToken cons@(Cons _) (vow@(Vow _) :<| ts) = (mapIndependent cons `TS.append` mapDependent vow, ts)
+    translateToken cons@(Cons _) ts@(Cons _ :<| _) = (mapIndependent cons `TS.append` mapIndependent Virama, ts)
     translateToken cons@(Cons _) ts@(Unmapped _ :<| _) = (mapIndependent cons `TS.append` mapIndependent Virama, ts)
-    translateToken cons@(Cons _) (ZWNJ :<| ts)         = (mapIndependent cons `TS.append` mapIndependent Virama `TS.append` mapIndependent ZWNJ, ts)
-    translateToken cons@(Cons _) (ZWJ :<| ts)          = (mapIndependent cons `TS.append` mapIndependent Virama `TS.append` mapIndependent ZWJ, ts)
-    translateToken token tokens@(_ :<| _)              = (mapIndependent token, tokens)
+    translateToken cons@(Cons _) (ZWNJ :<| ts) = (mapIndependent cons `TS.append` mapIndependent Virama `TS.append` mapIndependent ZWNJ, ts)
+    translateToken cons@(Cons _) (ZWJ :<| ts) = (mapIndependent cons `TS.append` mapIndependent Virama `TS.append` mapIndependent ZWJ, ts)
+    translateToken token tokens@(_ :<| _) = (mapIndependent token, tokens)
 
 toHarvard :: Generator
 toHarvard = toTransliteration mapHarvard TS.empty
@@ -98,8 +98,9 @@ tokenMapToMd =
   TS.concat $
     tableHeader
       : map
-        (\(hky, dev, ias, iso) -> 
-          "|" <> hky <> "|" <> dev <> "|" <> ias <> "|" <> iso <> "|\r")
+        ( \(hky, dev, ias, iso) ->
+            "|" <> hky <> "|" <> dev <> "|" <> ias <> "|" <> iso <> "|\r"
+        )
         tokenMap
   where
     tableHeader :: TS.ShortText

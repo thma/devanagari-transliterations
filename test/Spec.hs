@@ -1,6 +1,4 @@
-import           Data.Char.Devanagari.DevanagariTokens
-import           Data.Char.Devanagari.Generators
-import           Data.Char.Devanagari.Tokenizer
+import           Data.Char.Devanagari
 import           Data.Sequence
 import           Data.Text.Short                       (ShortText, pack)
 import qualified Hedgehog.Gen                          as Gen
@@ -114,7 +112,6 @@ spec = do
     it "handles unmapped characters gracefully" $ do
       let harvard' = pack "rüpel"
           deva' = pack "र्üपेल"
-      print $ fromHarvard harvard'
       (toDevanagari . fromHarvard) harvard' `shouldBe` deva'
 
   describe "Auto-Documentation" $ do

@@ -15,19 +15,16 @@ where
   tokenizer to use.
 -}
 
-import Control.Monad (join)
-import Data.Char.Devanagari.DevanagariTokens
-import Data.Char.Devanagari.TokenTables
-import Data.Map.Strict (Map)
-import Data.Map.Strict qualified as Map
-import Data.Maybe (isJust)
-import Data.Sequence
-  ( Seq (Empty, (:<|)),
-    empty,
-    (|>),
-  )
-import Data.Text.Short (ShortText)
-import Data.Text.Short qualified as T
+import           Control.Monad                         (join)
+import           Data.Char.Devanagari.DevanagariTokens
+import           Data.Char.Devanagari.TokenTables
+import           Data.Map.Strict                       (Map)
+import qualified Data.Map.Strict                       as Map
+import           Data.Maybe                            (isJust)
+import           Data.Sequence                         (Seq (Empty, (:<|)),
+                                                        empty, (|>))
+import           Data.Text.Short                       (ShortText)
+import qualified Data.Text.Short                       as T
 
 type Tokenizer = (ShortText -> Seq DevanagariToken)
 
@@ -51,13 +48,13 @@ parse pMap s = parse1 s pMap empty
     parse1 :: ShortText -> ParseMap -> Seq DevanagariToken -> Seq DevanagariToken
     parse1 str _ tokens
       | str == T.empty = tokens
-    parse1 str parseMap tokens = 
+    parse1 str parseMap tokens =
       case tryMatch str 3 parseMap of
         Just (token, rest) -> parse1 rest parseMap (tokens |> token)
-        Nothing -> 
+        Nothing ->
           case tryMatch str 2 parseMap of
             Just (token, rest) -> parse1 rest parseMap (tokens |> token)
-            Nothing -> 
+            Nothing ->
               case tryMatch str 1 parseMap of
                 Just (token, rest) -> parse1 rest parseMap (tokens |> token)
                 Nothing -> parse1 (T.drop 1 str) parseMap (tokens |> Unmapped (head $ T.unpack $ T.take 1 str))
@@ -84,11 +81,11 @@ fromDevanagari :: Tokenizer
 fromDevanagari s = addExplicitVowA empty (parse devanagariParseMap s)
   where
     addExplicitVowA :: Seq DevanagariToken -> Seq DevanagariToken -> Seq DevanagariToken
-    addExplicitVowA acc Empty                                  = acc
-    addExplicitVowA acc (cons@(Cons _) :<| Virama :<| xs)      = addExplicitVowA (acc |> cons) xs
+    addExplicitVowA acc Empty = acc
+    addExplicitVowA acc (cons@(Cons _) :<| Virama :<| xs) = addExplicitVowA (acc |> cons) xs
     addExplicitVowA acc (cons@(Cons _) :<| vow@(Vow _) :<| xs) = addExplicitVowA (acc |> cons |> vow) xs
-    addExplicitVowA acc (cons@(Cons _) :<| xs)                 = addExplicitVowA (acc |> cons |> Vow A) xs
-    addExplicitVowA acc (x :<| xs)                             = addExplicitVowA (acc |> x) xs
+    addExplicitVowA acc (cons@(Cons _) :<| xs) = addExplicitVowA (acc |> cons |> Vow A) xs
+    addExplicitVowA acc (x :<| xs) = addExplicitVowA (acc |> x) xs
 
 -- | tokenize a string of Text into a sequence of DevanagariTokens.
 -- The actual tokenizer is selected based on the content of the input string.
@@ -99,14 +96,13 @@ tokenize = join selectTokenizerByContent
 selectTokenizerByContent :: ShortText -> Tokenizer
 selectTokenizerByContent str
   | containsDevanagari str = fromDevanagari
-  | containsIso str        = fromIso
-  | containsIast str       = fromIast
-  | otherwise              = fromHarvard
+  | containsIso str = fromIso
+  | containsIast str = fromIast
+  | otherwise = fromHarvard
   where
     containsDevanagari = containsAnyOf (['\x900' .. '\x963'] ++ ['\x966' .. '\x97F']) -- Unicode section for Devanagari
-    containsIso        = containsAnyOf ("ēōṁ" ++ ['\0325', '\0304']) -- ISO15919 diacritics
-    containsIast       = containsAnyOf (['\241' .. '\363'] ++ ['\7693' .. '\7789']) -- IAST diacritics
-   
+    containsIso = containsAnyOf ("ēōṁ" ++ ['\0325', '\0304']) -- ISO15919 diacritics
+    containsIast = containsAnyOf (['\241' .. '\363'] ++ ['\7693' .. '\7789']) -- IAST diacritics
     containsAnyOf :: [Char] -> ShortText -> Bool
     containsAnyOf chars text = T.any (`isInfixOf` text) $ T.pack chars
     isInfixOf c text = isJust (T.find (== c) text)

@@ -24,6 +24,7 @@ source-repository head
 
 library
   exposed-modules:
+      Data.Char.Devanagari
       Data.Char.Devanagari.DevanagariTokens
       Data.Char.Devanagari.Generators
       Data.Char.Devanagari.Tokenizer
