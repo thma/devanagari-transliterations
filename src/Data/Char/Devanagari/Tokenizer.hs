@@ -26,8 +26,10 @@ import           Data.Sequence                         (Seq (Empty, (:<|)),
 import           Data.Text.Short                       (ShortText)
 import qualified Data.Text.Short                       as T
 
+-- | A Tokenizer is a function that takes a ShortText as input and produces a Sequence of DevanagariToken instances as output.
 type Tokenizer = (ShortText -> Seq DevanagariToken)
 
+-- | A ParseMap is a Map from a ShortText to a DevanagariToken.
 type ParseMap = Map ShortText DevanagariToken
 
 harvardKyotoParseMap :: ParseMap
@@ -42,6 +44,7 @@ isoParseMap = Map.fromList (isoTable ++ inputVirams)
 devanagariParseMap :: ParseMap
 devanagariParseMap = Map.fromList (devanagariIndependentTable ++ devanagariDependentTable ++ inputVirams)
 
+-- | parse a ShortText into a Sequence of DevanagariToken instances using a ParseMap.
 parse :: ParseMap -> ShortText -> Seq DevanagariToken
 parse pMap s = parse1 s pMap empty
   where
@@ -68,15 +71,19 @@ parse pMap s = parse1 s pMap empty
             Just token -> Just (token, rest)
             Nothing    -> Nothing
 
+-- | a tokenizer function that parses a ShortText containing IAST encoded Devanagari script into a Sequence of DevanagariToken instances.
 fromIast :: Tokenizer
 fromIast = parse iastParseMap
 
+-- | a tokenizer function that parses a ShortText containing ISO15919 encoded Devanagari script into a Sequence of DevanagariToken instances.
 fromIso :: Tokenizer
 fromIso = parse isoParseMap
 
+-- | a tokenizer function that parses a ShortText containing Harvard-Kyoto encoded Devanagari script into a Sequence of DevanagariToken instances.
 fromHarvard :: Tokenizer
 fromHarvard = parse harvardKyotoParseMap
 
+-- | a tokenizer function that parses a ShortText containing Devanagari script into a Sequence of DevanagariToken instances.
 fromDevanagari :: Tokenizer
 fromDevanagari s = addExplicitVowA empty (parse devanagariParseMap s)
   where
@@ -93,6 +100,7 @@ fromDevanagari s = addExplicitVowA empty (parse devanagariParseMap s)
 tokenize :: Tokenizer
 tokenize = join selectTokenizerByContent
 
+-- | select the correct tokenizer based on the content of the input string.
 selectTokenizerByContent :: ShortText -> Tokenizer
 selectTokenizerByContent str
   | containsDevanagari str = fromDevanagari

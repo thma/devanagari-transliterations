@@ -14,7 +14,7 @@ where
   produce a Sequence of DevanagariToken instances as output.
 
   A Generator for Devanagari or one of its roman transliterations will take a sequence of DevanagariToken instances
-  as input an will generate a UTF8 Text representation as output.
+  as input and will generate a UTF8 Text representation as output.
 -}
 
 data DevanagariToken
