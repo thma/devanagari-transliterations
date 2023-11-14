@@ -6,6 +6,7 @@ import           IoUtils                               (writeFileUtf8)
 import           Test.Hspec
 import           Test.Hspec.Hedgehog                   (Gen, forAll, hedgehog,
                                                         tripping)
+import Control.Monad (join)
 
 toEither :: Tokenizer -> ShortText -> Either String (Seq DevanagariToken)
 toEither f = Right . f
@@ -65,10 +66,10 @@ spec = do
 
   describe "selectParserByContent" $
     it "selects correct parse function based on input" $ do
-      selectTokenizerByContent deva deva `shouldBe` fromDevanagari deva
-      selectTokenizerByContent iast iast `shouldBe` fromIast iast
-      selectTokenizerByContent harvard harvard `shouldBe` fromHarvard harvard
-      selectTokenizerByContent iso iso `shouldBe` fromIso iso
+      join selectTokenizerByContent deva `shouldBe` fromDevanagari deva
+      join selectTokenizerByContent iast `shouldBe` fromIast iast
+      join selectTokenizerByContent harvard `shouldBe` fromHarvard harvard
+      join selectTokenizerByContent iso `shouldBe` fromIso iso
   describe "tokenize" $
     it "produces correct tokens for any input" $ do
       let expected = fromList [Cons S, Cons M, Vow AA, Cons R, Vow A, Cons M, Vow I, Anusvara]
