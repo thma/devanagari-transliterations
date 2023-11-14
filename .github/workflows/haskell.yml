@@ -1,43 +1,61 @@
 name: Haskell CI
 
 on:
-  push:
-    branches: [ "main" ]
+  workflow_dispatch:
   pull_request:
-    branches: [ "main" ]
-
-permissions:
-  contents: read
+    types: [synchronize, opened, reopened]
+  push:
+    branches: [main]
+  schedule:
+    # additionally run once per week (At 00:00 on Sunday) to maintain cache
+    - cron: '0 0 * * 0'
 
 jobs:
-  build:
 
+  stack:
+    name: stack / ghc ${{ matrix.ghc }}
     runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        stack: ["latest"]
+        ghc: ["9.2", "9.4", "9.6", "9.8"]
 
     steps:
     - uses: actions/checkout@v3
-    - uses: actions/setup-haskell@v1
-      with:
-        ghc-version: '9.4.5'
-        cabal-version: '3.2'
 
-    - name: Cache
-      uses: actions/cache@v3
-      env:
-        cache-name: cache-cabal
+    - uses: haskell/actions/setup@v2
+      name: Setup Haskell Stack
       with:
-        path: ~/.cabal
-        key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/*.cabal') }}-${{ hashFiles('**/cabal.project') }}
-        restore-keys: |
-          ${{ runner.os }}-build-${{ env.cache-name }}-
-          ${{ runner.os }}-build-
-          ${{ runner.os }}-
+        ghc-version: ${{ matrix.ghc }}
+        stack-version: ${{ matrix.stack }}
+        cabal-version: '3.6'
+
+    - uses: actions/cache@v3
+      name: Cache ~/.stack
+      with:
+        path: ~/.stack
+        key: ${{ runner.os }}-${{ matrix.ghc }}-stack
 
     - name: Install dependencies
       run: |
-        cabal update
-        cabal build --only-dependencies --enable-tests --enable-benchmarks
+        stack build --system-ghc --test --bench --no-run-tests --no-run-benchmarks --only-dependencies
+
     - name: Build
-      run: cabal build --enable-tests --enable-benchmarks all
-    - name: Run tests
-      run: cabal test all
+      run: |
+        stack build --system-ghc --test --bench --no-run-tests --no-run-benchmarks
+
+    - name: Test
+      run: |
+        stack test --system-ghc --coverage
+
+    - name: Install & run hpc-CodeCov
+      run: |
+        stack install hpc-codecov
+        hpc-codecov stack:all -o codecov.json
+        
+
+    - name: Upload coverage reports to Codecov
+      uses: codecov/codecov-action@v3
+      env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
