@@ -1,6 +1,5 @@
 import           Data.Char.Devanagari
 import           Data.Sequence
-import           Data.Text.Short                       (ShortText, pack)
 import qualified Hedgehog.Gen                          as Gen
 import           IoUtils                               (writeFileUtf8)
 import           Test.Hspec
