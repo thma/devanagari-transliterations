@@ -4,6 +4,7 @@ import qualified Hedgehog.Gen                          as Gen
 import           Test.Hspec
 import           Test.Hspec.Hedgehog                   (Gen, forAll, hedgehog,
                                                         tripping)
+import           Data.Text (Text, pack)
 import qualified Data.Text.IO as TIO                                                      
 import Control.Monad (join)
 

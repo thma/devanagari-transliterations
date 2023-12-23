@@ -16,14 +16,10 @@ module Data.Char.Devanagari
     toIast,
     tokenMap,
     tokenMapToMd,
-    tokenMapToHtml,
-    Text,
-    pack,
-    unpack
+    tokenMapToHtml
   )
 where
 
 import           Data.Char.Devanagari.DevanagariTokens
 import           Data.Char.Devanagari.Generators
 import           Data.Char.Devanagari.Tokenizer
-import           Data.Text                     (Text, pack, unpack)

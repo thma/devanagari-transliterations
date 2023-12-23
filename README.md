@@ -13,7 +13,29 @@ This library provides conversions between Devanagari (unicode block 0900-097F) a
 ## Usage
 
 ```haskell  
+{-# LANGUAGE OverloadedStrings #-}
 
+import Data.Char.Devanagari (tokenize, toDevanagari, toHarvard, toIast, toIso)
+import qualified Data.Text.IO as TIO
+
+main :: IO ()
+main = do
+  let tokens = tokenize "zubha lAbha"
+  putStrLn $ "tokens:        " <> show tokens
+  TIO.putStrLn $ "Devanagari:    " <> toDevanagari tokens
+  TIO.putStrLn $ "IAST:          " <> toIast tokens
+  TIO.putStrLn $ "ISO15919:      " <> toIso tokens
+  TIO.putStrLn $ "Harvard Kyoto: " <> toHarvard tokens
+```
+
+Output:
+
+```bash
+tokens:        fromList [Cons Stop,Vow U,Cons BH,Vow A,Unmapped ' ',Cons L,Vow AA,Cons BH,Vow A]
+Devanagari:    शुभ लाभ
+IAST:          śubha lābha
+ISO15919:      śubha lābha
+Harvard Kyoto: zubha lAbha
 ```
 
 ## The complete map of conversions
