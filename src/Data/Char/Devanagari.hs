@@ -17,17 +17,13 @@ module Data.Char.Devanagari
     tokenMap,
     tokenMapToMd,
     tokenMapToHtml,
-    ShortText,
+    Text,
     pack,
-    unpack,
-    fromString,
-    toString,
-    toText,
-    fromText
+    unpack
   )
 where
 
 import           Data.Char.Devanagari.DevanagariTokens
 import           Data.Char.Devanagari.Generators
 import           Data.Char.Devanagari.Tokenizer
-import           Data.Text.Short                      (ShortText, pack, unpack, fromString, toString, toText, fromText)
+import           Data.Text                     (Text, pack, unpack)

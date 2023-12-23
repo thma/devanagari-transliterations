@@ -51,14 +51,12 @@ library
     , deepseq
     , extra
     , text
-    , text-short
   default-language: GHC2021
 
 test-suite devanagari-transliterations-test
   type: exitcode-stdio-1.0
   main-is: Spec.hs
   other-modules:
-      IoUtils
       Paths_devanagari_transliterations
   autogen-modules:
       Paths_devanagari_transliterations
@@ -85,5 +83,4 @@ test-suite devanagari-transliterations-test
     , hspec
     , hspec-hedgehog
     , text
-    , text-short
   default-language: GHC2021

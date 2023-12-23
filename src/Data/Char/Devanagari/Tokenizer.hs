@@ -23,14 +23,14 @@ import qualified Data.Map.Strict                       as Map
 import           Data.Maybe                            (isJust)
 import           Data.Sequence                         (Seq (Empty, (:<|)),
                                                         empty, (|>))
-import           Data.Text.Short                       (ShortText)
-import qualified Data.Text.Short                       as T
+import           Data.Text                             (Text)
+import qualified Data.Text                       as T
 
--- | A Tokenizer is a function that takes a ShortText as input and produces a Sequence of DevanagariToken instances as output.
-type Tokenizer = (ShortText -> Seq DevanagariToken)
+-- | A Tokenizer is a function that takes a Text as input and produces a Sequence of DevanagariToken instances as output.
+type Tokenizer = (Text -> Seq DevanagariToken)
 
--- | A ParseMap is a Map from a ShortText to a DevanagariToken.
-type ParseMap = Map ShortText DevanagariToken
+-- | A ParseMap is a Map from a Text to a DevanagariToken.
+type ParseMap = Map Text DevanagariToken
 
 harvardKyotoParseMap :: ParseMap
 harvardKyotoParseMap = Map.fromList (harvardKyotoTable ++ inputVirams)
@@ -44,11 +44,11 @@ isoParseMap = Map.fromList (isoTable ++ inputVirams)
 devanagariParseMap :: ParseMap
 devanagariParseMap = Map.fromList (devanagariIndependentTable ++ devanagariDependentTable ++ inputVirams)
 
--- | parse a ShortText into a Sequence of DevanagariToken instances using a ParseMap.
-parse :: ParseMap -> ShortText -> Seq DevanagariToken
+-- | parse a Text into a Sequence of DevanagariToken instances using a ParseMap.
+parse :: ParseMap -> Text -> Seq DevanagariToken
 parse pMap s = parse1 s pMap empty
   where
-    parse1 :: ShortText -> ParseMap -> Seq DevanagariToken -> Seq DevanagariToken
+    parse1 :: Text -> ParseMap -> Seq DevanagariToken -> Seq DevanagariToken
     parse1 str _ tokens
       | str == T.empty = tokens
     parse1 str parseMap tokens =
@@ -62,7 +62,7 @@ parse pMap s = parse1 s pMap empty
                 Just (token, rest) -> parse1 rest parseMap (tokens |> token)
                 Nothing -> parse1 (T.drop 1 str) parseMap (tokens |> Unmapped (head $ T.unpack $ T.take 1 str))
 
-    tryMatch :: ShortText -> Int -> ParseMap -> Maybe (DevanagariToken, ShortText)
+    tryMatch :: Text -> Int -> ParseMap -> Maybe (DevanagariToken, Text)
     tryMatch str n parseMap =
       let tok = T.take n str
           rest = snd $ T.splitAt (T.length tok) str
@@ -71,19 +71,19 @@ parse pMap s = parse1 s pMap empty
             Just token -> Just (token, rest)
             Nothing    -> Nothing
 
--- | a tokenizer function that parses a ShortText containing IAST encoded Devanagari script into a Sequence of DevanagariToken instances.
+-- | a tokenizer function that parses a Text containing IAST encoded Devanagari script into a Sequence of DevanagariToken instances.
 fromIast :: Tokenizer
 fromIast = parse iastParseMap
 
--- | a tokenizer function that parses a ShortText containing ISO15919 encoded Devanagari script into a Sequence of DevanagariToken instances.
+-- | a tokenizer function that parses a Text containing ISO15919 encoded Devanagari script into a Sequence of DevanagariToken instances.
 fromIso :: Tokenizer
 fromIso = parse isoParseMap
 
--- | a tokenizer function that parses a ShortText containing Harvard-Kyoto encoded Devanagari script into a Sequence of DevanagariToken instances.
+-- | a tokenizer function that parses a Text containing Harvard-Kyoto encoded Devanagari script into a Sequence of DevanagariToken instances.
 fromHarvard :: Tokenizer
 fromHarvard = parse harvardKyotoParseMap
 
--- | a tokenizer function that parses a ShortText containing Devanagari script into a Sequence of DevanagariToken instances.
+-- | a tokenizer function that parses a Text containing Devanagari script into a Sequence of DevanagariToken instances.
 fromDevanagari :: Tokenizer
 fromDevanagari s = addExplicitVowA empty (parse devanagariParseMap s)
   where
@@ -101,7 +101,7 @@ tokenize :: Tokenizer
 tokenize = join selectTokenizerByContent
 
 -- | select the correct tokenizer based on the content of the input string.
-selectTokenizerByContent :: ShortText -> Tokenizer
+selectTokenizerByContent :: Text -> Tokenizer
 selectTokenizerByContent str
   | containsDevanagari str = fromDevanagari
   | containsIso str = fromIso
@@ -111,6 +111,6 @@ selectTokenizerByContent str
     containsDevanagari = containsAnyOf (['\x900' .. '\x963'] ++ ['\x966' .. '\x97F']) -- Unicode section for Devanagari
     containsIso = containsAnyOf ("ēōṁ" ++ ['\0325', '\0304']) -- ISO15919 diacritics
     containsIast = containsAnyOf (['\241' .. '\363'] ++ ['\7693' .. '\7789']) -- IAST diacritics
-    containsAnyOf :: [Char] -> ShortText -> Bool
+    containsAnyOf :: [Char] -> Text -> Bool
     containsAnyOf chars text = T.any (`isInfixOf` text) $ T.pack chars
     isInfixOf c text = isJust (T.find (== c) text)

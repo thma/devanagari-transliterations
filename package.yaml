@@ -21,7 +21,6 @@ description:         Please see the README on GitHub at <https://github.com/thma
 language: GHC2021    # See https://ghc-proposals.readthedocs.io/en/latest/proposals/0380-ghc2021.html
 
 default-extensions:
-#- DuplicateRecordFields
 - DeriveGeneric
 - DeriveAnyClass
 - DerivingStrategies
@@ -34,7 +33,6 @@ dependencies:
 - base >= 4.7 && < 5
 - containers
 - text
-- text-short
 - deepseq
 - array
 - extra

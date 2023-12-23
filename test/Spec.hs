@@ -1,13 +1,13 @@
 import           Data.Char.Devanagari
 import           Data.Sequence
 import qualified Hedgehog.Gen                          as Gen
-import           IoUtils                               (writeFileUtf8)
 import           Test.Hspec
 import           Test.Hspec.Hedgehog                   (Gen, forAll, hedgehog,
                                                         tripping)
+import qualified Data.Text.IO as TIO                                                      
 import Control.Monad (join)
 
-toEither :: Tokenizer -> ShortText -> Either String (Seq DevanagariToken)
+toEither :: Tokenizer -> Text -> Either String (Seq DevanagariToken)
 toEither f = Right . f
 
 -- `main` is here so that this module can be run from GHCi on its own.  It is
@@ -21,16 +21,16 @@ zwnj = ['\8204'] -- Zero Width Non Joiner
 zwj :: [Char]
 zwj = ['\8205'] -- Zero Width Joiner
 
-harvard :: ShortText
+harvard :: Text
 harvard = pack "smAramiM"
 
-iast :: ShortText
+iast :: Text
 iast = pack "smāramiṃ"
 
-deva :: ShortText
+deva :: Text
 deva = pack "स्मारमिं"
 
-iso :: ShortText
+iso :: Text
 iso = pack "smāramiṁ"
 
 spec :: Spec
@@ -122,7 +122,7 @@ spec = do
   describe "Auto-Documentation" $ do
     it "produces complete markdown Table" $ do
       let mdTokenMap = tokenMapToMd
-      writeFileUtf8 "tokenMap.md" mdTokenMap
+      TIO.writeFile "tokenMap.md" mdTokenMap
     it "produces complete html Table" $ do
       let htmlTokenMap = tokenMapToHtml
-      writeFileUtf8 "tokenMap.html" htmlTokenMap
+      TIO.writeFile "tokenMap.html" htmlTokenMap

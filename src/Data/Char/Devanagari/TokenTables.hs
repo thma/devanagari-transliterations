@@ -17,9 +17,9 @@ where
 -}
 
 import           Data.Char.Devanagari.DevanagariTokens
-import           Data.Text.Short                       (ShortText, pack)
+import           Data.Text                       (Text, pack)
 
-harvardKyotoTable :: [(ShortText, DevanagariToken)]
+harvardKyotoTable :: [(Text, DevanagariToken)]
 harvardKyotoTable =
   [ ("lRR", Vow LII),
     ("RR", Vow RII),
@@ -89,7 +89,7 @@ harvardKyotoTable =
     ("9", Dig NINE)
   ]
 
-iastTable :: [(ShortText, DevanagariToken)]
+iastTable :: [(Text, DevanagariToken)]
 iastTable =
   [ ("kh", Cons KH),
     ("gh", Cons GH),
@@ -159,7 +159,7 @@ iastTable =
     ("9", Dig NINE)
   ]
 
-isoTable :: [(ShortText, DevanagariToken)]
+isoTable :: [(Text, DevanagariToken)]
 isoTable =
   [ ("kh", Cons KH),
     ("gh", Cons GH),
@@ -229,7 +229,7 @@ isoTable =
     ("9", Dig NINE)
   ]
 
-devanagariIndependentTable :: [(ShortText, DevanagariToken)]
+devanagariIndependentTable :: [(Text, DevanagariToken)]
 devanagariIndependentTable =
   [ ("ख", Cons KH),
     ("घ", Cons GH),
@@ -300,7 +300,7 @@ devanagariIndependentTable =
     ("९", Dig NINE)
   ]
 
-devanagariDependentTable :: [(ShortText, DevanagariToken)]
+devanagariDependentTable :: [(Text, DevanagariToken)]
 devanagariDependentTable =
   [ ("ं", Anusvara),
     ("ँ", Anunasika),
@@ -325,7 +325,7 @@ devanagariDependentTable =
 -- This is meant as an optimization to ease manual input by using |, ||,
 -- _ representing the ZWNJ (zero width non joiner)
 -- \ representing the ZWJ (zero width joiner)
-inputVirams :: [(ShortText, DevanagariToken)]
+inputVirams :: [(Text, DevanagariToken)]
 inputVirams =
   [ ("|", PurnaViram),
     ("||", DeerghViram),
@@ -337,7 +337,7 @@ inputVirams =
     (pack ['\8205'], ZWJ)
   ]
 
-virams :: [(ShortText, DevanagariToken)]
+virams :: [(Text, DevanagariToken)]
 virams =
   [ ("।", PurnaViram),
     ("॥", DeerghViram),
@@ -345,7 +345,7 @@ virams =
     ("\\", ZWJ)
   ]
 
-viramsHarvard :: [(ShortText, DevanagariToken)]
+viramsHarvard :: [(Text, DevanagariToken)]
 viramsHarvard =
   [ ("|", PurnaViram),
     ("||", DeerghViram),
@@ -354,7 +354,7 @@ viramsHarvard =
   ]
 
 -- Devanagari needs special unicode characters for ZWNJ and ZWJ
-viramsDeva :: [(ShortText, DevanagariToken)]
+viramsDeva :: [(Text, DevanagariToken)]
 viramsDeva =
   [ ("।", PurnaViram),
     ("॥", DeerghViram),
