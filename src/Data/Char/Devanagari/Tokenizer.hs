@@ -98,15 +98,7 @@ fromDevanagari s = addExplicitVowA empty (parse devanagariParseMap s)
 -- The actual tokenizer is selected based on the content of the input string.
 -- This tokenizer is then applied to the input string.
 tokenize :: Tokenizer
-tokenize text = sinit $ join selectTokenizerByContent text'
-  where
-    text' = text <> " " -- add a space to the end of the input string to ensure that the last token is processed correctly
-
-    sinit                    :: Seq a -> Seq a
-    sinit (_ :<| Empty)      =  Empty
-    sinit (x :<| xs)         =  x :<| sinit xs
-    sinit Empty              =  error "sinit on empty sequence"
-
+tokenize = join selectTokenizerByContent
 
 -- | select the correct tokenizer based on the content of the input string.
 selectTokenizerByContent :: ShortText -> Tokenizer

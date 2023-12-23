@@ -87,6 +87,11 @@ spec = do
           tokens = tokenize harvard'
       tokens `shouldBe` fromList [Cons P, Vow A, Cons R, Vow A, Cons M, Unmapped ' ']
       toDevanagari tokens `shouldBe` pack "परम् "
+    it "adds a virama even without trailing blank" $ do
+      let harvard' = pack "param"
+          tokens = tokenize harvard'
+      tokens `shouldBe` fromList [Cons P, Vow A, Cons R, Vow A, Cons M]
+      toDevanagari tokens `shouldBe` pack "परम्"
     it "can detect tokens up to 3 chars" $ do
       let harvard' = pack "parlRRlRRm "
           tokens = tokenize harvard'
@@ -111,7 +116,7 @@ spec = do
       (toDevanagari . fromHarvard) harvard' `shouldBe` deva'
     it "handles unmapped characters gracefully" $ do
       let harvard' = pack "rüpel"
-          deva' = pack "र्üपेल"
+          deva' = pack "र्üपेल्"
       (toDevanagari . fromHarvard) harvard' `shouldBe` deva'
 
   describe "Auto-Documentation" $ do

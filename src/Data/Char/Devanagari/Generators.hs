@@ -69,6 +69,7 @@ translateToDeva acc (x :<| xs) =
    in translateToDeva (acc `TS.append` firstChars) restTokens
   where
     translateToken :: DevanagariToken -> Seq DevanagariToken -> (TS.ShortText, Seq DevanagariToken)
+    translateToken cons@(Cons _) Empty = (mapIndependent cons `TS.append` mapIndependent Virama, Empty)
     translateToken token Empty = (mapIndependent token, Empty)
     translateToken cons@(Cons _) (Vow A :<| ts) = (mapIndependent cons, ts)
     translateToken cons@(Cons _) (vow@(Vow _) :<| ts) = (mapIndependent cons `TS.append` mapDependent vow, ts)
