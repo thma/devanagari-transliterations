@@ -3,12 +3,13 @@
 [![License BSD3](https://img.shields.io/badge/license-BSD3-brightgreen.svg)](http://opensource.org/licenses/BSD-3-Clause)
 [![Actions Status](https://github.com/thma/devanagari-transliterations/workflows/Haskell%20CI/badge.svg)](https://github.com/thma/devanagari-transliterations/actions)
 [![codecov](https://codecov.io/gh/thma/devanagari-transliterations/graph/badge.svg?token=DBCFLEA8JZ)](https://codecov.io/gh/thma/devanagari-transliterations)
-
-<!--
 [![Available on Hackage](https://img.shields.io/hackage/v/devanagari-transliterations.svg?style=flat)](https://github.com/thma/devanagari-transliterations)
--->
 
-This library provides conversions between Devanagari (unicode block 0900-097F) and the transliterations Harvard-Kyoto, IAST and ISO15919.
+This library provides conversions between Devanagari (unicode block 0900-097F) and the transliterations [Harvard-Kyoto](https://en.wikipedia.org/wiki/Harvard-Kyoto), [IAST](https://en.wikipedia.org/wiki/International_Alphabet_of_Sanskrit_Transliteration) and [ISO15919](https://en.wikipedia.org/wiki/ISO_15919).
+
+It is particulary useful to produce Devanagari output from a 
+Harvard-Kyoto (ASCII-only) source. 
+This is shown in the example below.
 
 ## Usage
 
@@ -20,25 +21,35 @@ import qualified Data.Text.IO as TIO
 
 main :: IO ()
 main = do
-  let tokens = tokenize "zubha lAbha"
-  putStrLn $ "tokens:        " <> show tokens
-  TIO.putStrLn $ "Devanagari:    " <> toDevanagari tokens
+  let tokens = tokenize "zubha lAbha" -- meaning "good luck"
+  TIO.putStrLn $ "Devanagari:    " <> toDevanagari tokens 
   TIO.putStrLn $ "IAST:          " <> toIast tokens
   TIO.putStrLn $ "ISO15919:      " <> toIso tokens
   TIO.putStrLn $ "Harvard Kyoto: " <> toHarvard tokens
 ```
 
-Output:
+### Output:
 
 ```bash
-tokens:        fromList [Cons Stop,Vow U,Cons BH,Vow A,Unmapped ' ',Cons L,Vow AA,Cons BH,Vow A]
 Devanagari:    शुभ लाभ
 IAST:          śubha lābha
 ISO15919:      śubha lābha
 Harvard Kyoto: zubha lAbha
 ```
 
-## The complete map of conversions
+## Available on Hackage
+
+[https://hackage.haskell.org/package/devanagari-transliterations](https://hackage.haskell.org/package/devanagari-transliterations)
+
+Add the following to your `package.yaml` file:
+
+```yaml
+dependencies:
+- devanagari-transliterations
+```
+
+
+## The complete conversion table
 
 |Harvard-Kyoto|Devanagari|IAST|ISO15919|
 |----|----|----|----|
